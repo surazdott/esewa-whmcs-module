@@ -24,7 +24,7 @@ Extract the zip file and paste the following files in WHMCS modules/gateways
 |   |   |── callback
 |   |   └────── esewa.php
 |   |   |── esewa
-|   |   └────── helper.php
+|   |   └────── helpers.php
 |   |   └────── init.php
 |   |   └────── logo.png
 |   |   └────── whmcs.json
