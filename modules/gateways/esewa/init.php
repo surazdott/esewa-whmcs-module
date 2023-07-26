@@ -5,7 +5,7 @@
  *
  * For more information, please refer to the online documentation.
  *
- * @see https://github.com/surazdott/esewa-whmcs
+ * @see https://github.com/surazdott/esewa-whmcs-module
  *
  * @copyright Copyright (c) Suraj Datheputhe
  * @author : @Suraj Datheputhe

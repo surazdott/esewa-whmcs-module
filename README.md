@@ -4,7 +4,18 @@ eSewa Payment Gateway as a payment method in your WHMCS Panel.
 
 The eSewa payment plugin for WHMCS was created separate from the eSewa company. There are no connections between any of the plugin's creators and any of these two businesses.
 
-## Folder Structure
+## Features
+
+- Order Invoice Payment
+- Manual Invoice Payment
+
+## Installation
+
+Download the ZIP (or tar.gz) file from the releases [See the releases](https://github.com/surazdott/esewa-whmcs-module/releases)
+
+Extract the zip file and paste the following files in WHMCS modules/gateways
+
+### Folder Structure
 
 ```
 
@@ -22,27 +33,13 @@ The eSewa payment plugin for WHMCS was created separate from the eSewa company. 
 └── README.md
 ```
 
-## Features
-
-- Order Invoice Payment
-- Manual Invoice Payment
-
-## Installation
-
-How to install plugin in WHMCS
-
-- Go to the appropriate interface in the WHMCS Admin Area. ...
-- Find the desired payment gateway in the list (for example, Stripe) and click on it.
-- Click Activate.
-- Click Save Changes.
-
-Check out the installation guide and configuration of WHMCS Panel [Documentation](https://help.whmcs.com/m/setup/l/1075240-configuring-your-first-payment-gateway)
-    
-## Documentation
-Check out the installation guide and configuration of [WHMCS Panel](https://help.whmcs.com/m/setup/l/1075240-configuring-your-first-payment-gateway)
-
+- Go to the appropriate interface in the WHMCS Admin Area
+- Search esewa payment gateway in the payment list and click on it
 - Click on active button
 - Click on manage button and update your merchant code
+   
+## Documentation
+Check out the installation guide and configuration of [WHMCS Panel](https://help.whmcs.com/m/setup/l/1075240-configuring-your-first-payment-gateway)
 
 ## License
 

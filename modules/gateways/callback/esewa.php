@@ -1,14 +1,14 @@
 <?php
 
 /**
- * WHMCS eSewa Payment Gateway Module - Callback Script
+ * WHMCS eSewa Payment Gateway Module
  *
  * This script handles the callback response from the eSewa payment gateway.
  * It updates the payment status in WHMCS based on the callback response.
  * 
  * For more information, please refer to the online documentation.
  *
- * @see https://github.com/surazdott/esewa-whmcs
+ * @see https://github.com/surazdott/esewa-whmcs-module
  *
  * @copyright Copyright (c) Suraj Datheputhe
  * @author : @Suraj Datheputhe

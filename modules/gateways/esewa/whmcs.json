@@ -13,12 +13,12 @@
         "filename": "logo.png"
     },
     "support": {
-        "docs_url": "https://github.com/surazdott"
+        "docs_url": "https://github.com/surazdott/esewa-whmcs-module"
     },
     "authors": [
         {
             "name": "Suraj Datheputhe",
-            "homepage": "https://github.com/surazdott"
+            "homepage": "https://github.com/surazdott/esewa-whmcs-module"
         }
     ]
 }
