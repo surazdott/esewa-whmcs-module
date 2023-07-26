@@ -1,0 +1,24 @@
+{
+    "schema": "1.0",
+    "type": "whmcs-gateways",
+    "name": "esewa",
+    "license": "proprietary",
+    "category": "payments",
+    "description": {
+        "name": "eSewa Payment Gateway",
+        "tagline": "eSewa is a digital wallet based in Nepal.",
+        "long": "eSewa is a digital wallet based in Nepal providing instant online payment solutions. This is a third-party payment gateway module to integrate eSewa payment solution with the WHMCS platform."
+    },
+    "logo": {
+        "filename": "logo.png"
+    },
+    "support": {
+        "docs_url": "https://github.com/surazdott"
+    },
+    "authors": [
+        {
+            "name": "Suraj Datheputhe",
+            "homepage": "https://github.com/surazdott"
+        }
+    ]
+}
