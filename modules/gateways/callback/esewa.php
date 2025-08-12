@@ -12,7 +12,7 @@
  *
  * @copyright Copyright (c) Suraj Datheputhe
  * @author : @Suraj Datheputhe
- */
+*/
 
 # Include the WHMCS initialization file
 require_once __DIR__ . '/../../../init.php';
@@ -33,11 +33,14 @@ if (!$gatewayParams['type']) {
     die("Module Not Activated");
 }
 
+$paymentData = decodeSignature($_GET['data']);
+
 # Variable per payment gateway
-$invoiceId = decodeInvoice($_GET['oid']);
-$transactionId = $_GET['refId'];
-$paymentAmount = $_GET['amt'];
-$transactionStatus = $transactionId != null ? 'Success' : 'Failure';
+$invoiceId = decodeInvoice($paymentData['transaction_uuid']);
+
+$transactionId = $paymentData['transaction_uuid'];
+$totalAmount = $paymentData['total_amount'];
+$transactionStatus = $paymentData['status'];
 
 /**
  * Validate Callback Invoice ID.
@@ -51,8 +54,7 @@ $transactionStatus = $transactionId != null ? 'Success' : 'Failure';
  *
  * @param int $invoiceId Invoice ID
  * @param string $gatewayName Gateway Name
- */
-
+*/
 $invoiceId = checkCbInvoiceID($invoiceId, $gatewayParams['gatewayParams']);
 
 /**
@@ -63,17 +65,15 @@ $invoiceId = checkCbInvoiceID($invoiceId, $gatewayParams['gatewayParams']);
  */
 $invoice = WHMCS\Billing\Invoice::find($invoiceId);
 
-
 /**
  * Validate invoice amount
  * 
  * @return boolean 
  */
-if ($invoice->total != $paymentAmount) {
+if ($invoice->total != $totalAmount) {
     $failedUrl = $gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'&paymentfailed=true';
     redirect($failedUrl);
 } else {
-
     /**
      * Log Transaction.
      *
@@ -85,8 +85,7 @@ if ($invoice->total != $paymentAmount) {
      * @param string $gatewayName        Display label
      * @param string|array $debugData    Data to log
      * @param string $transactionStatus  Status
-     */
-
+    */
     logTransaction($gatewayModuleName, $_GET, $transactionStatus);
 
     /**
@@ -94,30 +93,26 @@ if ($invoice->total != $paymentAmount) {
      * 
      * @param int invoiceId
      * @param string transactionId
-     */
+    */
+    $url = $gatewayParams['test_mode'] == true ? 
+        'https://rc.esewa.com.np/api/epay/transaction/status/' : 
+        'https://epay.esewa.com.np/api/epay/transaction/status/';
 
-    $url = $gatewayParams['testMode'] == true ? 
-        'https://uat.esewa.com.np/epay/transrec' : 
-        'https://esewa.com.np/epay/transrec';
+    $paymentData['total_amount'] = str_replace(',', '', $paymentData['total_amount']);
 
-    $paymentData = [
-        'amt'=> $_GET['amt'],
-        'rid'=> $_GET['refId'],
-        'pid'=> $_GET['oid'],
-        'scd'=> $gatewayParams['MerchantCode']
-    ];
+    $paymentStatusUrl = $url . '?' . http_build_query($paymentData);
 
-    $curl = curl_init($url);
-    curl_setopt($curl, CURLOPT_POST, true);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $paymentData);
+    $curl = curl_init($paymentStatusUrl);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
     $result = curl_exec($curl);
     curl_close($curl);
 
-    $response = (string) simplexml_load_string($result)->response_code;
+    $response = json_decode($result, true);
+    $responseStatus = isset($response['status']) ? $response['status'] : '';
 
-    if (strpos($response, 'Success') == true) {
+
+    if ($responseStatus === 'COMPLETE') {
         $paymentFee = '0.0';
 
         /**
@@ -127,14 +122,14 @@ if ($invoice->total != $paymentAmount) {
          *
          * @param int $invoiceId         Invoice ID
          * @param string $transactionId  Transaction ID
-         * @param float $paymentAmount   Amount paid (defaults to full balance)
+         * @param float $totalAmount   Amount paid (defaults to full balance)
          * @param float $paymentFee      Payment fee (optional)
          * @param string $gatewayModule  Gateway module name
-         */
+        */
         addInvoicePayment(
             $invoiceId,
             $transactionId,
-            $paymentAmount,
+            $totalAmount,
             $paymentFee,
             $gatewayModuleName
         );

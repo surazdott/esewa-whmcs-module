@@ -9,14 +9,14 @@
  *
  * @copyright Copyright (c) Suraj Datheputhe
  * @author : @Suraj Datheputhe
- */
+*/
 
 /**
  * Redirect page
- * 
+ *
  * @param string url
- * @return redirect
- */ 
+ * @return void
+*/
 function redirect($path)
 {
     header('location: '.$path);
@@ -24,43 +24,67 @@ function redirect($path)
 }
 
 /**
- * Encode invoice to pass unique Invoice number
- * 
+ * Create random string.
+ *
  * @param int length
  * @return string
- */
-function encodeInvoice($invoiceId)
-{
-    $encode = randomString(7).'-'.$invoiceId;
+*/
+function randomString($length = 100) {
+    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $str_len = strlen($chars);
+    $random = '';
 
-    return $encode;
+    for($i=0; $i<$length; $i++) {
+        $random .= $chars[rand(0, $str_len-1)];
+    }
+
+    return $random;
 }
 
 /**
- * Decode invoice number
- * 
- * @param int length
+ * Encode invoice to pass unique Invoice number.
+ *
+ * @param string invoiceId
  * @return string
- */
-function decodeInvoice($string)
+*/
+function encodeInvoice(string $invoiceId)
+{
+    return randomString(7).'-'.$invoiceId;
+}
+
+/**
+ * Decode invoice number.
+ *
+ * @param string string
+ * @return string
+*/
+function decodeInvoice(string $string)
 {
     return substr($string, 8);
 }
 
 /**
- * Create random string
- * 
- * @param int leng
+ * Generate signature for the payment.
+ *
+ * @param array $data
  * @return string
- */
-function randomString($leng=100) {
-    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $str_len = strlen($chars);
-    $random = '';
+*/
+function generateSignature(string $secretKey, array $data): string
+{
+    $signedFields = "total_amount={$data['amount']}," .
+        "transaction_uuid={$data['transaction_uuid']}," .
+        "product_code={$data['product_code']}";
 
-    for($i=0; $i<$leng; $i++) {
-        $random .= $chars[rand(0, $str_len-1)];
-    }
+    return base64_encode(hash_hmac('sha256', $signedFields, $secretKey ?? '', true));
+}
 
-    return $random;
+/**
+ * Decrypt signature for the payment.
+ *
+ * @param string $data
+ * @return array
+*/
+function decodeSignature(string $data): array
+{
+    return json_decode(base64_decode($data), true);
 }

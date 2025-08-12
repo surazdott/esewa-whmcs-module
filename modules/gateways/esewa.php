@@ -2,7 +2,7 @@
 
 /**
  * WHMCS eSewa Payment Gateway Module
- * 
+ *
  * eSewa Payment Gateway modules WHMCS platform.
  *
  * For more information, please refer to the online documentation.
@@ -11,7 +11,7 @@
  *
  * @copyright Copyright (c) Suraj Datheputhe
  * @author : @Suraj Datheputhe
- */
+*/
 
 if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
@@ -29,12 +29,12 @@ require_once __DIR__ . '/esewa/init.php';
  * @see https://developers.whmcs.com/provisioning-modules/meta-data-params/
  *
  * @return array
- */
+*/
 function esewa_MetaData()
 {
     return array(
         'DisplayName' => 'eSewa Payment Gateway',
-        'APIVersion' => '1.1',
+        'APIVersion' => '2.0',
         'DisableLocalCreditCardInput' => true,
         'TokenisedStorage' => false,
     );
@@ -46,7 +46,7 @@ function esewa_MetaData()
  * @see https://developers.whmcs.com/provisioning-modules/config-options/
  *
  * @return array
- */
+*/
 function esewa_config()
 {
     return array(
@@ -54,14 +54,21 @@ function esewa_config()
             'Type' => 'System',
             'Value' => 'eSewa Payment Gateway',
         ),
-        'MerchantCode' => array(
+        'merchant_code' => array(
             'FriendlyName' => 'Merchant Code',
+            'Type' => 'text',
+            'Size' => '25',
+            'Default' => '',
+            'Description' => 'Enter your merchant code provided by Esewa',
+        ),
+        'secret_key' => array(
+            'FriendlyName' => 'Secret Key',
             'Type' => 'password',
             'Size' => '25',
             'Default' => '',
-            'Description' => 'Enter your Merchant Code here provided by eSewa',
+            'Description' => 'Enter your secret code provided by Esewa',
         ),
-        'testMode' => array(
+        'test_mode' => array(
             'FriendlyName' => 'Test Mode',
             'Type' => 'yesno',
             'Description' => 'Tick to enable test mode',
@@ -72,7 +79,6 @@ function esewa_config()
 /**
  * eSewa Payment Gateway link.
  *
- *
  * Defines the HTML output displayed on an invoice. Typically consists of an
  * HTML form that will take the user to the payment gateway endpoint.
  *
@@ -81,53 +87,38 @@ function esewa_config()
  * @see https://developers.whmcs.com/payment-gateways/third-party-gateway/
  *
  * @return string
- */
+*/
 function esewa_link($params)
 {
     // Gateway Configuration Parameters
-    $testMode = $params['testMode'];
-    $merchantCode = $params['MerchantCode'];
+    $merchantCode = $params['merchant_code'];
+    $secretKey = $params['secret_key'];
 
     // Invoice Parameters
     $invoiceId = $params['invoiceid'];
-    $description = $params["description"];
     $amount = $params['amount'];
-    $currencyCode = $params['currency'];
-
-    // Client Parameters
-    $firstname = $params['clientdetails']['firstname'];
-    $lastname = $params['clientdetails']['lastname'];
-    $email = $params['clientdetails']['email'];
-    $address1 = $params['clientdetails']['address1'];
-    $address2 = $params['clientdetails']['address2'];
-    $city = $params['clientdetails']['city'];
-    $state = $params['clientdetails']['state'];
-    $postcode = $params['clientdetails']['postcode'];
-    $country = $params['clientdetails']['country'];
-    $phone = $params['clientdetails']['phonenumber'];
 
     // System Parameters
-    $companyName = $params['companyname'];
     $systemUrl = $params['systemurl'];
     $returnUrl = $params['returnurl'];
     $langPayNow = $params['langpaynow'];
-    $moduleDisplayName = $params['name'];
     $moduleName = $params['paymentmethod'];
-    $whmcsVersion = $params['whmcsVersion'];
 
-    $url = $params['testMode'] == true ? 'https://uat.esewa.com.np/epay/main' : 'https://esewa.com.np/epay/main';
+    $url = $params['test_mode'] == true ? 'https://rc-epay.esewa.com.np/api/epay/main/v2/form' : 'https://esewa.com.np/epay/main';
 
-    $postfields = array();
-    $postfields['pid'] = encodeInvoice($invoiceId);
-    $postfields['tAmt'] = $amount;
-    $postfields['amt'] = $amount;
-    $postfields['txAmt'] = '0';
-    $postfields['psc'] = '0';
-    $postfields['pdc'] = '0';
-    $postfields['scd'] = $merchantCode;
-    $postfields['su'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
-    $postfields['fu'] = $returnUrl;
-
+    $postfields = [];
+    $postfields['amount'] = $amount;
+    $postfields['tax_amount'] = '0';
+    $postfields['total_amount'] = $amount;
+    $postfields['transaction_uuid'] = encodeInvoice($invoiceId);
+    $postfields['product_code'] = $merchantCode;
+    $postfields['product_service_charge'] = 0;
+    $postfields['product_delivery_charge'] = 0;
+    $postfields['success_url'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
+    $postfields['failure_url'] = $returnUrl;
+    $postfields['signed_field_names'] = 'total_amount,transaction_uuid,product_code';
+    $postfields['signature'] = generateSignature($secretKey, $postfields);
+    
     $htmlOutput = '<form method="post" action="' . $url . '">';
 
     foreach ($postfields as $k => $v) {
@@ -154,7 +145,7 @@ function esewa_link($params)
  * @see https://developers.whmcs.com/payment-gateways/refunds/
  *
  * @return array Transaction response status
- */
+*/
 function esewa_refund($params)
 {
     return false;
