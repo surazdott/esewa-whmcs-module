@@ -29,7 +29,7 @@ $gatewayModuleName = basename(__FILE__, '.php');
 $gatewayParams = getGatewayVariables($gatewayModuleName);
 
 # Check if the gateway is activated
-if (!$gatewayParams['type']) {
+if (! $gatewayParams['type']) {
     die("Module Not Activated");
 }
 
@@ -37,8 +37,6 @@ $paymentData = decodeSignature($_GET['data']);
 
 # Variable per payment gateway
 $invoiceId = decodeInvoice($paymentData['transaction_uuid']);
-
-$transactionId = $paymentData['transaction_uuid'];
 $totalAmount = $paymentData['total_amount'];
 $transactionStatus = $paymentData['status'];
 
@@ -71,7 +69,7 @@ $invoice = WHMCS\Billing\Invoice::find($invoiceId);
  * @return boolean 
  */
 if ($invoice->total != $totalAmount) {
-    $failedUrl = $gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'&paymentfailed=true';
+    $failedUrl = $gatewayParams['systemurl'].'viewinvoice.php?id='.$invoiceId.'&paymentfailed=true';
     redirect($failedUrl);
 } else {
     /**
@@ -86,13 +84,10 @@ if ($invoice->total != $totalAmount) {
      * @param string|array $debugData    Data to log
      * @param string $transactionStatus  Status
     */
-    logTransaction($gatewayModuleName, $_GET, $transactionStatus);
+    logTransaction($gatewayModuleName, $paymentData, $transactionStatus);
 
     /**
-     * Payment Verification Process and Update Invoice Paid
-     * 
-     * @param int invoiceId
-     * @param string transactionId
+     * Payment Verification Process and Update Invoice Paid Status.
     */
     $url = $gatewayParams['test_mode'] == true ? 
         'https://rc.esewa.com.np/api/epay/transaction/status/' : 
@@ -110,7 +105,7 @@ if ($invoice->total != $totalAmount) {
 
     $response = json_decode($result, true);
     $responseStatus = isset($response['status']) ? $response['status'] : '';
-
+    $transactionId = isset($response['ref_id']) ? $response['ref_id'] : '';
 
     if ($responseStatus === 'COMPLETE') {
         $paymentFee = '0.0';
@@ -134,10 +129,10 @@ if ($invoice->total != $totalAmount) {
             $gatewayModuleName
         );
 
-        $successUrl = $gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'&paymentsuccess=true';
+        $successUrl = $gatewayParams['systemurl'].'viewinvoice.php?id='.$invoiceId.'&paymentsuccess=true';
         redirect($successUrl);
     } else {
-        $failedUrl = $gatewayParams['systemurl'].'/viewinvoice.php?id='.$invoiceId.'&paymentfailed=true';
+        $failedUrl = $gatewayParams['systemurl'].'viewinvoice.php?id='.$invoiceId.'&paymentfailed=true';
         redirect($failedUrl);
     }
 }

@@ -114,7 +114,7 @@ function esewa_link($params)
     $postfields['product_code'] = $merchantCode;
     $postfields['product_service_charge'] = 0;
     $postfields['product_delivery_charge'] = 0;
-    $postfields['success_url'] = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
+    $postfields['success_url'] = $systemUrl . 'modules/gateways/callback/' . $moduleName . '.php';
     $postfields['failure_url'] = $returnUrl;
     $postfields['signed_field_names'] = 'total_amount,transaction_uuid,product_code';
     $postfields['signature'] = generateSignature($secretKey, $postfields);
@@ -125,7 +125,7 @@ function esewa_link($params)
         $htmlOutput .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
     }
 
-    $logo = $systemUrl . '/modules/gateways/esewa/logo.png';
+    $logo = $systemUrl . 'modules/gateways/esewa/logo.png';
 
     $htmlOutput .= '<img src="'.$logo.'" width="130"><br>';
 
