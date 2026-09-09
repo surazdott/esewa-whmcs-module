@@ -104,7 +104,9 @@ function esewa_link($params)
     $langPayNow = $params['langpaynow'];
     $moduleName = $params['paymentmethod'];
 
-    $url = $params['test_mode'] == true ? 'https://rc-epay.esewa.com.np/api/epay/main/v2/form' : 'https://esewa.com.np/epay/main';
+    $url = $params['test_mode'] == true
+        ? 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
+        : 'https://epay.esewa.com.np/api/epay/main/v2/form ';
 
     $postfields = [];
     $postfields['amount'] = $amount;
