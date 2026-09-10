@@ -62,6 +62,8 @@ WHMCS_ROOT/
 | Secret Key | The corresponding eSewa signing key. Keep production credentials private. |
 | Test Mode | Enable for sandbox checkout; disable only after resolving the limitations below and completing testing. |
 
+<p align="center"><img src="./modules/gateways/esewa/config.jpg" alt="esew whmcs module configuration"></p>
+
 If WHMCS is installed in a subdirectory, that directory is included in the URL. You do not normally enter this URL into the module settings.
 
 Use current sandbox credentials from the [official eSewa integration documentation](https://developer.esewa.com.np/pages/Epay). Test credentials and production credentials must belong to their respective environments.
