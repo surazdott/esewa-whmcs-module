@@ -1,3 +1,5 @@
+<p align="center"><img src="./modules/gateways/esewa/social.jpg" alt="eSewa WHMCS Module — ePay v2 Payment Gateway Plugin"></p>
+
 # eSewa WHMCS Module — ePay v2 Payment Gateway Plugin
 
 Connect eSewa to WHMCS with this third-party PHP payment gateway module. The eSewa WHMCS plugin adds an eSewa payment button to invoices, redirects customers to eSewa checkout, and checks transaction status before recording a payment in WHMCS.
